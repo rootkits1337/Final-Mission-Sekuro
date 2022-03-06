@@ -27,6 +27,11 @@ private:
 	int m_kurama_y;
 
 public:
+	/*
+	* Inisiasi Map, set semua value di map menjadi 0, 
+	* set koordinat robot (0,0) dengan mengisi koordinat (0,0) pada robot menjadi 1
+	* set koordinat kurama secara random dan assign nilai pada koordinat tersebut pada robot menjadi -1
+	*/
 	Map() {
 		m_map.resize(length, vect(width, 0));
 		// set posisi kurama secara random
@@ -50,21 +55,27 @@ public:
 		}
 		cout << "Ket: 1 adalah robot dan -1 adalah Mecha-Kurama" << endl;
 	}
+	// set nilai pada koordinat x, y
 	void set(size_t x, size_t y, int val) {
 		m_map[y][x] = val;
 	}
+	// mengembalikan nilai pada koordinat x, y
 	int get(size_t x, size_t y) {
 		return m_map[y][x];
 	}
+	// mengembalikan nilai pada koordinat x robot
 	int get_robot_x() {
 		return m_robot_x;
 	}
+	// mengembalikan nilai pada koordinat y robot
 	int get_robot_y() {
 		return m_robot_y;
 	}
+	// mengembalikan nilai pada koordinat x kurama
 	int get_kurama_x() {
 		return m_kurama_x;
 	}
+	// mengembalikan nilai pada koordinat y kurama
 	int get_kurama_y() {
 		return m_kurama_y;
 	}
@@ -75,16 +86,20 @@ private:
 	int m_health;
 	int m_dmg;
 public:
+	// set health dan dmg pada karakter
 	Character(int health, int dmg) {
 		m_health = health;
 		m_dmg = dmg;
 	}
+	// mengembalikan hp karakter sekarang
 	int get_health() {
 		return m_health;
 	}
+	// mengembalikan damage yang dapat dihasilkan
 	int get_dmg() {
 		return m_dmg;
 	}
+	// set hp karakter menjadi new_health
 	void set_health(int new_health) {
 		m_health = new_health;
 	}
