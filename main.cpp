@@ -33,16 +33,43 @@ void WarState::robot_keatas() {
 void WarState::robot_kebawah() {
 	// robot bergerak ke bawah
 	// lakukan boundary checking
+	if (m_robot_y == 0){
+		cout<< "Error: Robot tidak dapat keluar dari peta" << endl;
+		return;
+	}
+	m_map->set(m_robot_x, m_robot_y, 0);
+	m_map->set(m_robot_x, m_robot_y - 1, 1);
+	cout << "Robot bergerak dari (" << m_robot_x << "," << m_robot_y << ")"
+		<< " ke " << "(" << m_robot_x << ", " << m_robot_y - 1 << ")" << endl;
+	--m_robot_y;
 }
 
 void WarState::robot_kekanan() {
 	// robot bergerak ke kanan
 	// lakukan boundary checking
+	if (m_robot_x == 20){
+		cout<< "Error: Robot tidak dapat keluar dari peta" << endl;
+		return;
+	}
+	m_map->set(m_robot_x, m_robot_y, 0);
+	m_map->set(m_robot_x + 1, m_robot_y, 1);
+	cout << "Robot bergerak dari (" << m_robot_x << "," << m_robot_y << ")"
+		<< " ke " << "(" << m_robot_x + 1<< ", " << m_robot_y << ")" << endl;
+	++m_robot_x;
 }
 
 void WarState::robot_kekiri() {
 	// robot bergerak ke kiri
 	// lakukan boundary checking
+	if (m_robot_x == 0){
+		cout<< "Error: Robot tidak dapat keluar dari peta" << endl;
+		return;
+	}
+	m_map->set(m_robot_x, m_robot_y, 0);
+	m_map->set(m_robot_x - 1, m_robot_y, 1);
+	cout << "Robot bergerak dari (" << m_robot_x << "," << m_robot_y << ")"
+		<< " ke " << "(" << m_robot_x - 1<< ", " << m_robot_y << ")" << endl;
+	--m_robot_x;
 }
 
 int WarState::jarak_x() {
@@ -98,6 +125,15 @@ void WarState::main_loop() {
 			break;
 		case 2:
 			robot_keatas();
+			break;
+		case 3:
+			robot_kebawah();
+			break;
+		case 4:
+			robot_kekanan();
+			break;
+		case 5:
+			robot_kekiri();
 			break;
 		case 0: 
 			return;
