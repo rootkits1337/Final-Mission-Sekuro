@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <ctime>
+#include <cmath>
 #include <memory>
 
 using vect2 = std::vector<std::vector<int>>;

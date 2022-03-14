@@ -74,17 +74,18 @@ void WarState::robot_kekiri() {
 
 int WarState::jarak_x() {
 	// mengembalikan jarak x antara robot dan kurama
-	return 0;
+	return (abs(m_robot_x - m_kurama_x));
 }
 
 int WarState::jarak_y() {
 	// mengembalikan jarak y antara robot dan kurama
-	return 0;
+	return (abs(m_robot_y - m_kurama_y));
 }
 
 double WarState::hitung_jarak() {
 	// mengembalikan jarak antara robot dan kurama (euclidean ? manhattan ? chebyshev ?)
-	return 0;
+	// digunakan jarak euclidean
+	return (sqrt(pow(jarak_x(),2)+pow(jarak_y(), 2)));
 }
 
 int WarState::isgameover() {
@@ -112,7 +113,7 @@ void WarState::main_loop() {
 		}
 		cout << "Pilih Aksi" << endl;
 		cout << "0. Keluar" << endl;
-		cout << "1. Tampilkan peta" << endl;
+		cout << "1. Tampilkan peta dan jarak" << endl;
 		cout << "2. Robot ke atas" << endl;
 		cout << "3. Robot ke bawah" << endl;
 		cout << "4. Robot ke kanan" << endl;
@@ -122,6 +123,7 @@ void WarState::main_loop() {
 		{
 		case 1:
 			print_map();
+			cout << "Jarak antara robot dan mecha-kurama adalah " << hitung_jarak() << endl;
 			break;
 		case 2:
 			robot_keatas();
