@@ -88,9 +88,13 @@ double WarState::hitung_jarak() {
 	return (sqrt(pow(jarak_x(),2)+pow(jarak_y(), 2)));
 }
 
-int WarState::isgameover() {
+bool WarState::isgameover() {
 	// periksa apakah perang sudah berakhir.
-	return 0;
+	Character robot = *m_robot.get();
+	if(robot.get_health() <= 0){
+		return true;
+	}
+	return false;
 }
 
 void WarState::serang_kurama() {
@@ -154,7 +158,5 @@ int main() {
 	int ctr = 0;
 	WarState war_state;
 	war_state.main_loop();
-
-
 	return 0;
 }

@@ -126,7 +126,7 @@ public:
 	double hitung_jarak();
 	void serang_kurama(); // robot menyerang kurama
 	void serang_robot(); // kurama menyerang robot
-	int isgameover(); // periksa apakah perang sudah berakhir
+	bool isgameover(); // periksa apakah perang sudah berakhir
 	void print_map();
 	void main_loop();
 };
