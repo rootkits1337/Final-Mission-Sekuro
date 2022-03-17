@@ -8,8 +8,14 @@
 
 using vect2 = std::vector<std::vector<int>>;
 using vect = std::vector<int>;
-static const size_t length = 21;
-static const size_t width = 21;
+static const int default_map_length = 21;
+static const int default_map_width = 21;
+static const double default_robot_hp = 100;
+static const double default_robot_dmg = 10;
+static const double default_robot_range = 10;
+static const double default_kurama_hp = 50;
+static const double default_kurama_dmg = 8;
+static const double default_kurama_range = 5;
 
 using std::cin;
 using std::cout;
@@ -22,6 +28,8 @@ using std::make_shared;
 class Map {
 private:
 	vect2 m_map;
+	int m_length;
+	int m_width;
 	int m_robot_x;
 	int m_robot_y;
 	int m_kurama_x;
@@ -29,28 +37,35 @@ private:
 
 public:
 	/*
-	* Inisiasi Map, set semua value di map menjadi 0, 
+	* Inisiasi Map, set semua value di map menjadi 0,
 	* set koordinat robot (0,0) dengan mengisi koordinat (0,0) pada robot menjadi 1
 	* set koordinat kurama secara random dan assign nilai pada koordinat tersebut pada robot menjadi -1
 	*/
 	Map() {
-		m_map.resize(length, vect(width, 0));
-		// set posisi kurama secara random
-		do {
-			m_kurama_x = rand() % length;
-			m_kurama_y = rand() % width;
-		} while (m_kurama_x == 0 && m_kurama_y == 0); // jangan sampai mecha-kurama spawn di tempat yang sama dengan robot
-		this->set(m_kurama_x, m_kurama_y, -1);
+		m_length = default_map_length;
+		m_width = default_map_width;
+		m_map.resize(m_length, vect(m_width, 0));
 		this->set(0, 0, 1);
 		// robot selalu mulai di koordinat 0, 0
 		m_robot_x = 0;
 		m_robot_y = 0;
+		random_kurama();
+	}
+	void random_kurama() {
+		// set posisi kurama secara random
+		do {
+			m_kurama_x = rand() % m_length;
+			m_kurama_y = rand() % m_width;
+		} while (m_kurama_x == m_robot_x && m_kurama_y == m_robot_y); // jangan sampai mecha-kurama spawn di tempat yang sama dengan robot
+		this->set(m_kurama_x, m_kurama_y, -1);
+		cout << "Kurama di spawn pada koordinat (" << m_kurama_x << ", "
+			<< m_kurama_y << ")" << endl;
 	}
 	// tampilkan sesuai koordinat kartesius
 	void print_map() {
-		for (size_t i = 0; i < length; ++i) {
-			for (size_t j = 0; j < width; ++j) {
-				cout << m_map[length - i - 1][j] << " ";
+		for (size_t i = 0; i < m_length; ++i) {
+			for (size_t j = 0; j < m_width; ++j) {
+				cout << m_map[m_length - i - 1][j] << " ";
 			}
 			cout << endl;
 		}
@@ -80,17 +95,20 @@ public:
 	int get_kurama_y() {
 		return m_kurama_y;
 	}
+	~Map() = default;
 };
 
 class Character {
 private:
-	int m_health;
-	int m_dmg;
+	double m_health;
+	double m_dmg;
+	double m_att_range;
 public:
 	// set health dan dmg pada karakter
-	Character(int health, int dmg) {
-		m_health = health;
-		m_dmg = dmg;
+	Character(double health, double dmg, double range)
+		: m_health(health), m_dmg(dmg), m_att_range(range)
+	{
+
 	}
 	// mengembalikan hp karakter sekarang
 	int get_health() {
@@ -100,10 +118,14 @@ public:
 	int get_dmg() {
 		return m_dmg;
 	}
+	double get_range() {
+		return m_att_range;
+	}
 	// set hp karakter menjadi new_health
-	void set_health(int new_health) {
+	void set_health(double new_health) {
 		m_health = new_health;
 	}
+	~Character() = default;
 };
 
 class WarState {
@@ -115,6 +137,7 @@ private:
 	int m_robot_y;
 	int m_kurama_x;
 	int m_kurama_y;
+	int m_kill;
 public:
 	WarState();
 	void robot_keatas();
@@ -129,4 +152,6 @@ public:
 	bool isgameover(); // periksa apakah perang sudah berakhir
 	void print_map();
 	void main_loop();
+	void kurama_turn();
+	~WarState() = default;
 };
