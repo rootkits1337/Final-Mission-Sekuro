@@ -19,62 +19,83 @@ WarState::WarState() {
 		default_kurama_hp, default_kurama_dmg, default_kurama_range
 	); // set health = 50, dmg = 8
 	m_kill = 0;
+	is_robot_act = 0;
 }
 
-void WarState::robot_keatas() {
+bool WarState::robot_keatas() {
 	// robot bergerak ke atas
 	// lakukan boundary checking
 	if (m_robot_y == 20) {
 		cout << "Error: Robot tidak dapat keluar dari peta" << endl;
-		return;
+		return false;
+	}
+	if (m_robot_x == m_kurama_x && m_robot_y + 1 == m_kurama_y) {
+		cout << "Error: Robot tidak dapat menabrak kurama" << endl;
+		return false;
 	}
 	m_map->set(m_robot_x, m_robot_y, 0);
 	m_map->set(m_robot_x, m_robot_y + 1, 1);
 	cout << "Robot bergerak dari (" << m_robot_x << "," << m_robot_y << ")"
 		<< " ke " << "(" << m_robot_x << ", " << m_robot_y + 1 << ")" << endl;
 	++m_robot_y;
+	return true;
 }
 
-void WarState::robot_kebawah() {
+bool WarState::robot_kebawah() {
 	// robot bergerak ke bawah
 	// lakukan boundary checking
 	if (m_robot_y == 0){
 		cout<< "Error: Robot tidak dapat keluar dari peta" << endl;
-		return;
+		return false;
+	}
+	if (m_robot_x == m_kurama_x && m_robot_y - 1 == m_kurama_y) {
+		cout << "Error: Robot tidak dapat menabrak kurama" << endl;
+		return false;
 	}
 	m_map->set(m_robot_x, m_robot_y, 0);
 	m_map->set(m_robot_x, m_robot_y - 1, 1);
 	cout << "Robot bergerak dari (" << m_robot_x << "," << m_robot_y << ")"
 		<< " ke " << "(" << m_robot_x << ", " << m_robot_y - 1 << ")" << endl;
 	--m_robot_y;
+	return true;
 }
 
-void WarState::robot_kekanan() {
+bool WarState::robot_kekanan() {
 	// robot bergerak ke kanan
 	// lakukan boundary checking
 	if (m_robot_x == 20){
 		cout<< "Error: Robot tidak dapat keluar dari peta" << endl;
-		return;
+		return false;
+	}
+	if (m_robot_x + 1 == m_kurama_x && m_robot_y == m_kurama_y) {
+		cout << "Error: Robot tidak dapat menabrak kurama" << endl;
+		return false;
 	}
 	m_map->set(m_robot_x, m_robot_y, 0);
 	m_map->set(m_robot_x + 1, m_robot_y, 1);
 	cout << "Robot bergerak dari (" << m_robot_x << "," << m_robot_y << ")"
 		<< " ke " << "(" << m_robot_x + 1<< ", " << m_robot_y << ")" << endl;
 	++m_robot_x;
+	return true;
 }
 
-void WarState::robot_kekiri() {
+bool WarState::robot_kekiri() {
 	// robot bergerak ke kiri
 	// lakukan boundary checking
 	if (m_robot_x == 0){
 		cout<< "Error: Robot tidak dapat keluar dari peta" << endl;
-		return;
+		return false;
+	}
+	if (m_robot_x - 1 == m_kurama_x && m_robot_y == m_kurama_y) {
+		cout << "Error: Robot tidak dapat menabrak kurama" << endl;
+		return false;
 	}
 	m_map->set(m_robot_x, m_robot_y, 0);
 	m_map->set(m_robot_x - 1, m_robot_y, 1);
 	cout << "Robot bergerak dari (" << m_robot_x << "," << m_robot_y << ")"
 		<< " ke " << "(" << m_robot_x - 1<< ", " << m_robot_y << ")" << endl;
 	--m_robot_x;
+	return false;
 }
 
 int WarState::jarak_x() {
@@ -102,26 +123,33 @@ bool WarState::isgameover() {
 	return false;
 }
 
-void WarState::serang_kurama() {
+bool WarState::serang_kurama() {
 	// robot menyerang kurama
 	// hp kurama berkurang sesuai dengan besarnya serangan robot
 	// keluarkan pesar error bila kurama di luar jangkauan serang robot
 	double jarak = hitung_jarak();
 	if (jarak > m_robot->get_range()) {
 		cout << "Kurama di luar jangkauan!\n";
-		return;
+		return false;
 	}
 	double old_kurama_hp = m_kurama->get_health();
 	double robot_dmg = m_robot->get_dmg();
 	m_kurama->set_health(old_kurama_hp - robot_dmg);
 	cout << "Menyerang kurama dengan " << robot_dmg << " damage" << endl;
 	cout << "HP Kurama saat ini: " << m_kurama->get_health() << endl << endl;
+	return true;
 }
 
 void WarState::serang_robot() {
 	// kurama menyerang robot
 	// hp robot berkurang sesuai serangan kurama
-	// keluarkan pesar error bila robot di luar jangkauan serang kurama
+	// karena serangan kurama otomatis, maka tidak perlu dilakukan pengecekan jarak di sini
+	// ketika fungsi serang_robot dipanggil, maka robot sudah pasti ada di jarak serang kurama
+	double old_robot_hp = m_robot->get_health();
+	double kurama_dmg = m_kurama->get_dmg();
+	m_robot->set_health(old_robot_hp - kurama_dmg);
+	cout << "Kurama menyerang robot dengan " << kurama_dmg << " damage" << endl;
+	cout << "HP Robot saat ini menjadi: " << m_robot->get_health() << endl << endl;
 }
 
 // AI Kurama
@@ -132,6 +160,51 @@ void WarState::kurama_turn() {
 	// 2. Jika sudah berada pada range, serang robot (panggil fungsi serang_robot)
 	// 3. Jika belum berada pada range, pilih langkah terbaik untuk mendekati robot
 	// Langkah terbaik didapatkan dengan membandingkan posisi (x,y) kurama dan robot
+
+	double jarak = hitung_jarak();
+	if (jarak <= m_kurama->get_range()) {
+		serang_robot();
+		return;
+	}
+	// gerak ke arah yg jaraknya paling jauh
+	if (jarak_x() < jarak_y()) {
+		// gerak searah sumbu y
+		if (m_kurama_y < m_robot_y) {
+			// kurama gerak ke atas
+			m_map->set(m_kurama_x, m_kurama_y, 0);
+			m_map->set(m_kurama_x, m_kurama_y + 1, -1);
+			cout << "Kurama bergerak dari (" << m_kurama_x << "," << m_kurama_y << ")"
+				<< " ke " << "(" << m_kurama_x << ", " << m_kurama_y + 1 << ")" << endl;
+			++m_kurama_y;
+		}
+		else {
+			// kurama gerak ke bawah
+			m_map->set(m_kurama_x, m_kurama_y, 0);
+			m_map->set(m_kurama_x, m_kurama_y - 1, -1);
+			cout << "Kurama bergerak dari (" << m_kurama_x << "," << m_kurama_y << ")"
+				<< " ke " << "(" << m_kurama_x << ", " << m_kurama_y - 1 << ")" << endl;
+			--m_kurama_y;
+		}
+	}
+	else {
+		// gerak searah sumbu x
+		if (m_kurama_x < m_robot_x) {
+			// kurama gerak ke kanan
+			m_map->set(m_kurama_x, m_kurama_y, 0);
+			m_map->set(m_kurama_x + 1, m_kurama_y, -1);
+			cout << "Kurama bergerak dari (" << m_kurama_x << "," << m_kurama_y << ")"
+				<< " ke " << "(" << m_kurama_x + 1 << ", " << m_kurama_y << ")" << endl;
+			++m_kurama_x;
+		}
+		else {
+			// kurama gerak ke kiri
+			m_map->set(m_kurama_x, m_kurama_y, 0);
+			m_map->set(m_kurama_x - 1, m_kurama_y, -1);
+			cout << "Kurama bergerak dari (" << m_kurama_x << "," << m_kurama_y << ")"
+				<< " ke " << "(" << m_kurama_x - 1<< ", " << m_kurama_y << ")" << endl;
+			--m_kurama_x;
+		}
+	}
 }
 
 void WarState::main_loop() {
@@ -163,19 +236,19 @@ void WarState::main_loop() {
 			cout << "Jarak antara robot dan mecha-kurama adalah " << hitung_jarak() << endl;
 			break;
 		case 2:
-			robot_keatas();
+			is_robot_act = robot_keatas();
 			break;
 		case 3:
-			robot_kebawah();
+			is_robot_act = robot_kebawah();
 			break;
 		case 4:
-			robot_kekanan();
+			is_robot_act = robot_kekanan();
 			break;
 		case 5:
-			robot_kekiri();
+			is_robot_act = robot_kekiri();
 			break;
 		case 6:
-			serang_kurama();
+			is_robot_act = serang_kurama();
 			double kurama_hp = m_kurama->get_health();
 			if (kurama_hp <= 0) {
 				// karena kurama mati, maka old kurama di delete dan buat objek kurama baru
@@ -193,7 +266,11 @@ void WarState::main_loop() {
 			break;
 		}
 		// kurama akan memilih langkah terbaik untuk menghadapi robot
-		kurama_turn();
+		if (is_robot_act) {
+			// jika robot sudah bergerak atau berhasil menyerang, maka kurama juga akan bergerak atau menyerang
+			kurama_turn();
+			is_robot_act = 0;
+		}
 	} while (option != 0);
 }
 

@@ -138,16 +138,17 @@ private:
 	int m_kurama_x;
 	int m_kurama_y;
 	int m_kill;
+	bool is_robot_act; // cek robot sudah bergerak atau berhasil menyerang
 public:
 	WarState();
-	void robot_keatas();
-	void robot_kebawah();
-	void robot_kekiri();
-	void robot_kekanan();
+	bool robot_keatas();
+	bool robot_kebawah();
+	bool robot_kekiri();
+	bool robot_kekanan();
 	int jarak_x(); // selisih x antara robot dengan dengan
 	int jarak_y(); // selisih y antara robot dengan kurama
 	double hitung_jarak();
-	void serang_kurama(); // robot menyerang kurama
+	bool serang_kurama(); // robot menyerang kurama
 	void serang_robot(); // kurama menyerang robot
 	bool isgameover(); // periksa apakah perang sudah berakhir
 	void print_map();
