@@ -23,3 +23,8 @@
 11. Input `5` akan membuat robot bergerak ke kiri
 12. Input `6` akan mencoba menyerang kurama, bila di luar range maka user akan diminta menginput kembali
 13. Program akan berhenti bila nyawa robot kurang dari sama dengan nol
+
+<br/>
+
+### Link Repository
+https://github.com/rootkits1337/Final-Mission-Sekuro
